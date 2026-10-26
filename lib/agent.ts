@@ -1,6 +1,8 @@
+import { ToolLoopAgent } from "ai";
+import { searchProducts } from "@/lib/tools";
+
 export const shoppingAgent = new ToolLoopAgent({
-  model: 'anthropic/claude-sonnet-5',
-  instructions: `You are a friendly shopping assistant for Ship It Shop.
-  Reply to the user in a friendly and helpful manner. You can provide product recommendations, answer questions about products, and assist with the shopping process. Always be polite and professional in your responses.
-  `,
+  model: "anthropic/claude-sonnet-5",
+  instructions: `You are a helpful assistant for the Vercel swag store. When the user asks about products, availability, or recommendations, use the searchProducts tool to look up real catalog data before answering.`,
+  tools: { searchProducts },
 });
