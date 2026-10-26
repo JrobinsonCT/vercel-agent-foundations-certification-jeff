@@ -1,6 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { ApiRequestError, getCategories, getProducts } from "@/lib/api";
+import { ApiRequestError, createReturn, getCategories, getOrder, getProducts, preauthorizeRefund, notifyReturnInProcess } from "@/lib/api";
 
 export const searchProducts = tool({
   description: `Search the Vercel swag store product catalog. Use this whenever the user asks about products, what the store sells, or wants recommendations. Optionally narrow results to a single category.`,
@@ -64,6 +64,40 @@ export const getAllCategories = tool({
       const message =
         err instanceof ApiRequestError ? err.message : "Unknown error";
       return { count: 0, categories: [], error: message };
+    }
+  },
+});
+
+export const returnOrder = tool({
+  description: `File a return for one of the user's past orders. The user must provide an order ID and a reason. Example order IDs: 11111, 22222, 33333.`,
+  inputSchema: z.object({
+    orderId: z
+      .string()
+      .describe("The order ID the user wants to return."),
+    reason: z
+      .string()
+      .min(10)
+      .max(500)
+      .describe("Why the user is returning the order."),
+  }),
+  execute: async ({ orderId, reason }) => {
+    try {
+      const order = await getOrder(orderId);
+      await notifyReturnInProcess(orderId);
+      await preauthorizeRefund(orderId);
+      const filed = await createReturn({
+        orderId: order.id,
+        items: order.items.map((i) => ({
+          productId: i.productId,
+          quantity: i.quantity,
+        })),
+        reason,
+      });
+      return { returnId: filed.id, status: filed.status };
+    } catch (err) {
+      const message =
+        err instanceof ApiRequestError ? err.message : "Unknown error";
+      return { error: message };
     }
   },
 });
