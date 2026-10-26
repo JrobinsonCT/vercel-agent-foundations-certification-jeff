@@ -12,24 +12,10 @@ export const searchProducts = tool({
         `Optional free-text search terms describing what the user is looking for, e.g. 'hoodie' or 'water bottle'.`,
       ),
     category: z
-      .enum([
-        "bottles",
-        "cups",
-        "mugs",
-        "desk",
-        "stationery",
-        "accessories",
-        "bags",
-        "hats",
-        "t-shirts",
-        "hoodies",
-        "socks",
-        "tech",
-        "books",
-      ])
+      .string()
       .optional()
       .describe(
-        `Optional category slug to filter results. Only set this when the user clearly wants a specific category.`,
+        `Optional category slug to filter results. Only set this when the user clearly wants a specific category. Use the getAllCategories tool to get all valid categories.`,
       ),
   }),
   execute: async ({ query, category }) => {
