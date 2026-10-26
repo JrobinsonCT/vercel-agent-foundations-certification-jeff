@@ -9,13 +9,34 @@ export const searchProducts = tool({
       .string()
       .optional()
       .describe(
-        `Optional, free-text search terms describing what the user is looking for, e.g. 'hoodie' or 'water bottle'.`,
+        `Optional free-text search terms describing what the user is looking for, e.g. 'hoodie' or 'water bottle'.`,
+      ),
+    category: z
+      .enum([
+        "bottles",
+        "cups",
+        "mugs",
+        "desk",
+        "stationery",
+        "accessories",
+        "bags",
+        "hats",
+        "t-shirts",
+        "hoodies",
+        "socks",
+        "tech",
+        "books",
+      ])
+      .optional()
+      .describe(
+        `Optional category slug to filter results. Only set this when the user clearly wants a specific category.`,
       ),
   }),
-  execute: async ({ query }) => {
+  execute: async ({ query, category }) => {
     try {
       const products = await getProducts({
         search: query,
+        category,
         limit: 10,
       });
       return {
