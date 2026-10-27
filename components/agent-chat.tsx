@@ -17,13 +17,11 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
-import type { ShoppingAgentUIMessage } from "@/lib/agent";
-import { AgentProductList } from "./agent-product-list";
 
 export function AgentChat() {
   const [input, setInput] = useState("");
 
-  const { messages, error, sendMessage } = useChat<ShoppingAgentUIMessage>();
+  const { messages, error, sendMessage } = useChat();
 
   const handleSubmit = (message: PromptInputMessage) => {
     sendMessage({ text: input });
@@ -46,10 +44,6 @@ export function AgentChat() {
                         <MessageResponse>{p.text}</MessageResponse>
                       </MessageContent>
                     </Message>
-                  );
-                case "tool-searchProducts":
-                  return (
-                    <AgentProductList key={`${m.id}-${i}`} invocation={p} />
                   );
                 default:
                   return null;
