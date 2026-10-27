@@ -82,12 +82,7 @@ export const getProductDetails = tool({
         category: product.category,
         images: product.images,
         image: product.images[0],
-        sizes: product.sizes ?? [],
-        stock: {
-          inStock: stock.quantity > 0,
-          quantity: stock.quantity,
-          lowStock: stock.quantity > 0 && stock.quantity <= 5,
-        },
+
         related,
       };
     } catch (err) {
