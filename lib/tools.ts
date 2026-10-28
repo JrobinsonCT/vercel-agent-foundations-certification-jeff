@@ -69,6 +69,8 @@ export const getProductDetails = tool({
         currency: product.currency,
         category: product.category,
         images: product.images,
+        tags: product.tags,
+        featured: product.featured,
         stock: stock.stock,
         instock: stock.inStock,
         lowstock: stock.lowStock,      };
