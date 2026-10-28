@@ -14,7 +14,7 @@ export function AgentProductCard({ invocation }: AgentProductCardProps) {
     invocation.state === "input-streaming" ||
     invocation.state === "input-available"
   ) {
-    const id = invocation.input?.productId;
+    const id = invocation.input?.productId 
     return (
       <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
         Looking up{id ? ` "${id}"` : ""}…
@@ -31,16 +31,16 @@ export function AgentProductCard({ invocation }: AgentProductCardProps) {
   if ("error" in output) {
     return (
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-        {output.error as string}
+        {output.error}
       </div>
     );
   }
 
   const image = output.images[0];
-  const stocklabel = output.instock
-    ? output.lowstock
-      ? "Low stock"
-      : "In stock"
+  const stockLabel = output.inStock
+    ? output.lowStock
+      ? `Only ${output.stock} left`
+      : `${output.stock} in stock`
     : "Out of stock";
 
   return (
@@ -66,6 +66,7 @@ export function AgentProductCard({ invocation }: AgentProductCardProps) {
               {formatPrice(output.price, output.currency)}
             </p>
           </div>
+          <p className="shrink-0 text-sm text-muted-foreground">{stockLabel}</p>
         </div>
         <p className="line-clamp-3 text-sm text-muted-foreground">
           {output.description}
