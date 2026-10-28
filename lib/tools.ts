@@ -51,27 +51,15 @@ export const getProductDetails = tool({
   inputSchema: z.object({
     productId: z
       .string()
-      .describe(`The product id, as returned by searchProducts.`),
+      .describe(`The product id, as returned by (id or slug) searchProducts.`),
   }),
   execute: async ({ productId }) => {
+    "use step";
     try {
       const [product, stock] = await Promise.all([
         getProductById(productId),
         getProductStock(productId),
       ]);
-
-      // Related products: same category, excluding this one
-      let related: { id: string; name: string; image: string; price: number }[] = [];
-      try {
-        const sameCategory = await getProducts({ category: product.category, limit: 4 });
-        related = sameCategory
-          .filter((p) => p.id !== product.id)
-          .slice(0, 3)
-          .map((p) => ({ id: p.id, name: p.name, image: p.images[0], price: p.price }));
-      } catch {
-        // related products are optional; ignore failures
-      }
-
       return {
         id: product.id,
         name: product.name,
@@ -81,10 +69,9 @@ export const getProductDetails = tool({
         currency: product.currency,
         category: product.category,
         images: product.images,
-        image: product.images[0],
-
-        related,
-      };
+        stock: stock.stock,
+        instock: stock.inStock,
+        lowstock: stock.lowStock,      };
     } catch (err) {
       const message =
         err instanceof ApiRequestError ? err.message : "Unknown error";
