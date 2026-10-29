@@ -13,6 +13,13 @@ import {
   searchProducts,
   getAllCategories,
 } from "@/lib/tools";
+import { createOrGetSandbox, SANDBOX_NAME } from "@/lib/sandbox";
+
+export async function readMemories() {
+  const sandbox = await createOrGetSandbox(SANDBOX_NAME);
+  const buffer = await sandbox.readFileToBuffer({ path: "memories.md" });
+  return buffer ? new TextDecoder().decode(buffer) : null;
+}
 
 export const backOfficeInstructions = `You are the back-office assistant for the Vercel swag store. You have read-only access to returns, inventory, sales, and support tickets through tools, and a persistent bash sandbox for computation.
 
@@ -36,9 +43,20 @@ export async function adminChatFlow(messages: UIMessage[]) {
 
   const modelMessages = await convertToModelMessages(messages);
 
+  const memories = await readMemories();
+
   const agent = new WorkflowAgent({
     model: "anthropic/claude-sonnet-5",
-    instructions: backOfficeInstructions,
+    instructions: [
+      backOfficeInstructions,
+      "",
+      "## Memory protocol",
+      "You have a memories.md file at /vercel/sandbox/memories.md. Append to it with the bash tool.",
+      "",
+      memories
+        ? `## Current memories\n\n${memories}`
+        : "No memories yet.",
+    ].join("\n"),
     tools: {
       bash,
       getReturnsHistory,
